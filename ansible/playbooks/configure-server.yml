@@ -5,9 +5,7 @@
   become: true
 
   vars:
-    app_dir: /opt/notesapp
-    app_user: notesapp
-    repo_url: https://github.com/mosesekerin/systems-evolution-lab.git
+    image: mosesekerin/notesapp:v1
 
   tasks:
 
@@ -17,59 +15,46 @@
         state: latest
         update_cache: true
 
-    - name: Install required packages
+    - name: Install Docker
       dnf:
-        name:
-          - git
-          - nodejs
+        name: docker
         state: present
 
-    - name: Create notesapp system user
-      user:
-        name: "{{ app_user }}"
-        system: true
-        create_home: true
-        shell: /sbin/nologin
-        state: present
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
 
-    - name: Create application directory
+    - name: Create log file
       file:
-        path: "{{ app_dir }}"
-        state: directory
-        owner: "{{ app_user }}"
-        group: "{{ app_user }}"
-        mode: "0755"
+        path: /var/log/notesapp.log
+        state: touch
+        mode: "0644"
 
-    - name: Clone application repository
-      git:
-        repo: "{{ repo_url }}"
-        dest: "{{ app_dir }}"
-        version: main
-        force: true
-      become_user: "{{ app_user }}"
-
-    - name: Set ownership on all application files
+    - name: Create persistent storage file
       file:
-        path: "{{ app_dir }}"
-        state: directory
-        recurse: true
-        owner: "{{ app_user }}"
-        group: "{{ app_user }}"
+        path: /opt/notesapp/notes.json
+        state: touch
+        mode: "0644"
 
-    - name: Find all scripts
-      find:
-        paths: "{{ app_dir }}/scripts"
-        patterns: "*.sh"
-      register: script_files
+    - name: Copy systemd service file
+      copy:
+        src: ../../systemd/notesapp.service
+        dest: /etc/systemd/system/notesapp.service
+        mode: "0644"
 
-    - name: Make all scripts executable
-      file:
-        path: "{{ item.path }}"
-        mode: "0755"
-      loop: "{{ script_files.files }}"
+    - name: Pull Docker image from Docker Hub
+      docker_image:
+        name: "{{ image }}"
+        source: pull
 
-    - name: Run notesapp setup script (user-level only)
-      shell: "{{ app_dir }}/scripts/setup_notesapp.sh"
-      args:
-        chdir: "{{ app_dir }}"
-      become: true
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: true
+
+    - name: Enable and start notesapp service
+      systemd:
+        name: notesapp
+        state: started
+        enabled: true

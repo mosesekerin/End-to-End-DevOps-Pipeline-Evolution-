@@ -1,0 +1,10 @@
+Architecture/
+Terraform/
+ansible/
+docs/
+scripts/
+systemd/
+README.md
+.git/
+node_modules/
+*.pem
