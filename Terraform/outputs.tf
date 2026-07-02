@@ -5,7 +5,7 @@ output "instance_id" {
 
 output "public_ip" {
   description = "Public IP address of the NotesApp server"
-  value       = aws_instance.notesapp.public_ip
+  value       = aws_eip.notesapp.public_ip
 }
 
 output "private_key_path" {

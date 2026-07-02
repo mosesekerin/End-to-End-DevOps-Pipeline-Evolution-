@@ -194,3 +194,16 @@ resource "aws_instance" "notesapp" {
     Name = "notesapp-server"
   }
 }
+
+# -------------------------
+# ELASTIC IP
+# -------------------------
+
+resource "aws_eip" "notesapp" {
+  instance = aws_instance.notesapp.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "notesapp-eip"
+  }
+}
