@@ -5,7 +5,7 @@
   become: true
 
   vars:
-    image: mosesekerin/notesapp:v1
+    image: mosesekerin/notesapp:latest
 
   tasks:
 

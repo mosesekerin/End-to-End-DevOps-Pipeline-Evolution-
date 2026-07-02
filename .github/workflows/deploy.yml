@@ -1,0 +1,48 @@
+# .github/workflows/deploy.yml
+name: Build and Deploy NotesApp
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t mosesekerin/notesapp:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: docker push mosesekerin/notesapp:latest
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Write SSH key to file
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > notesapp-key.pem
+          chmod 400 notesapp-key.pem
+
+      - name: Write Ansible inventory
+        run: |
+          mkdir -p ansible/inventory
+          echo "[notesapp]" > ansible/inventory/hosts.ini
+          echo "${{ secrets.EC2_HOST }} ansible_user=ec2-user ansible_ssh_private_key_file=notesapp-key.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory/hosts.ini
+
+      - name: Run Ansible playbook
+        run: |
+          cd ansible
+          ansible-playbook playbooks/site.yml
