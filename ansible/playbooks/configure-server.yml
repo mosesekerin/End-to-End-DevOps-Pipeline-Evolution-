@@ -1,0 +1,75 @@
+# ansible/playbooks/configure-server.yml
+---
+- name: Configure NotesApp Server
+  hosts: notesapp
+  become: true
+
+  vars:
+    app_dir: /opt/notesapp
+    app_user: notesapp
+    repo_url: https://github.com/mosesekerin/systems-evolution-lab.git
+
+  tasks:
+
+    - name: Update all system packages
+      dnf:
+        name: "*"
+        state: latest
+        update_cache: true
+
+    - name: Install required packages
+      dnf:
+        name:
+          - git
+          - nodejs
+        state: present
+
+    - name: Create notesapp system user
+      user:
+        name: "{{ app_user }}"
+        system: true
+        create_home: true
+        shell: /sbin/nologin
+        state: present
+
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0755"
+
+    - name: Clone application repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: true
+      become_user: "{{ app_user }}"
+
+    - name: Set ownership on all application files
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        recurse: true
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+
+    - name: Find all scripts
+      find:
+        paths: "{{ app_dir }}/scripts"
+        patterns: "*.sh"
+      register: script_files
+
+    - name: Make all scripts executable
+      file:
+        path: "{{ item.path }}"
+        mode: "0755"
+      loop: "{{ script_files.files }}"
+
+    - name: Run notesapp setup script (user-level only)
+      shell: "{{ app_dir }}/scripts/setup_notesapp.sh"
+      args:
+        chdir: "{{ app_dir }}"
+      become: true
