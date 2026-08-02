@@ -80,20 +80,20 @@ Each stage was driven by a specific pain point:
                ▼                          ▼
 ┌──────────────────────┐    ┌─────────────────────────────────────┐
 │      Docker Hub      │    │           AWS EC2 (t2.micro)        │
-│                      │    │           Amazon Linux 2023          │
+│                      │    │           Amazon Linux 2023         │
 │  mosesekerin/        │    │           Elastic IP: 54.172.6.245  │
 │  notesapp:latest     │    │                                     │
 │                      │    │   ┌─────────────────────────────┐   │
 └──────────────────────┘    │   │         systemd             │   │
                │            │   │  manages docker container   │   │
                │            │   └──────────────┬──────────────┘   │
-               │            │                  │                   │
-               └────────────┼──► docker pull   │                   │
-                            │                  ▼                   │
+               │            │                  │                  │
+               └────────────┼──► docker pull   │                  │
+                            │                  ▼                  │
                             │   ┌─────────────────────────────┐   │
-                            │   │    Docker Container          │   │
-                            │   │    node:18-alpine            │   │
-                            │   │    NotesApp :3000            │   │
+                            │   │    Docker Container         │   │
+                            │   │    node:18-alpine           │   │
+                            │   │    NotesApp :3000           │   │
                             │   └─────────────────────────────┘   │
                             │                                     │
                             └─────────────────────────────────────┘
@@ -102,12 +102,12 @@ Each stage was driven by a specific pain point:
 │                    AWS Infrastructure (Terraform)               │
 │                                                                 │
 │   VPC (10.0.0.0/16)                                             │
-│   └── Public Subnet (10.0.1.0/24)                              │
+│   └── Public Subnet (10.0.1.0/24)                               │
 │       ├── Internet Gateway                                      │
 │       ├── Route Table                                           │
-│       ├── Security Group (ports 22, 80, 3000)                  │
+│       ├── Security Group (ports 22, 80, 3000)                   │
 │       ├── EC2 Instance (Amazon Linux 2023)                      │
-│       └── Elastic IP (54.172.6.245)                            │
+│       └── Elastic IP (54.172.6.245)                             │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
