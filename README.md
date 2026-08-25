@@ -60,8 +60,7 @@ Each stage was driven by a specific pain point:
 ## Architecture At a Glance
 
 <p align="center">
-  <img src="Architecture/
-Gemini_Generated_Image_179ffz179ffz179f.jpg" alt="GitHub Banner" width="100%">
+  <img src="Architecture/Gemini_Generated_Image_179ffz179ffz179f.jpg" alt="GitHub Banner" width="100%">
 </p>
 ---
 
