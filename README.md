@@ -57,60 +57,12 @@ Each stage was driven by a specific pain point:
 
 ---
 
-## Final Architecture
+## Architecture At a Glance
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Developer Machine                        │
-│                                                                 │
-│   git push origin main                                          │
-└─────────────────────┬───────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      GitHub Actions                             │
-│                                                                 │
-│   1. Checkout code                                              │
-│   2. Login to Docker Hub                                        │
-│   3. docker build -t mosesekerin/notesapp:latest .              │
-│   4. docker push mosesekerin/notesapp:latest                    │
-│   5. ansible-playbook playbooks/site.yml                        │
-└──────────────┬──────────────────────────┬───────────────────────┘
-               │                          │
-               ▼                          ▼
-┌──────────────────────┐    ┌─────────────────────────────────────┐
-│      Docker Hub      │    │           AWS EC2 (t2.micro)        │
-│                      │    │           Amazon Linux 2023         │
-│  mosesekerin/        │    │           Elastic IP: 54.172.6.245  │
-│  notesapp:latest     │    │                                     │
-│                      │    │   ┌─────────────────────────────┐   │
-└──────────────────────┘    │   │         systemd             │   │
-               │            │   │  manages docker container   │   │
-               │            │   └──────────────┬──────────────┘   │
-               │            │                  │                  │
-               └────────────┼──► docker pull   │                  │
-                            │                  ▼                  │
-                            │   ┌─────────────────────────────┐   │
-                            │   │    Docker Container         │   │
-                            │   │    node:18-alpine           │   │
-                            │   │    NotesApp :3000           │   │
-                            │   └─────────────────────────────┘   │
-                            │                                     │
-                            └─────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                    AWS Infrastructure (Terraform)               │
-│                                                                 │
-│   VPC (10.0.0.0/16)                                             │
-│   └── Public Subnet (10.0.1.0/24)                               │
-│       ├── Internet Gateway                                      │
-│       ├── Route Table                                           │
-│       ├── Security Group (ports 22, 80, 3000)                   │
-│       ├── EC2 Instance (Amazon Linux 2023)                      │
-│       └── Elastic IP (54.172.6.245)                             │
-└─────────────────────────────────────────────────────────────────┘
-```
-
+<p align="center">
+  <img src="Architecture/
+Gemini_Generated_Image_179ffz179ffz179f.jpg" alt="GitHub Banner" width="100%">
+</p>
 ---
 
 ## Technology Stack
